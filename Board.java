@@ -1,6 +1,7 @@
 
 public class Board {
 	private Checker[][] checkers;
+	private int player;
 	
 	public static void main(String[] args){
 		Board board = new Board();
@@ -8,11 +9,12 @@ public class Board {
 	}
 	
 	public Board(){
+		player = 1;
 		checkers = new Checker[8][8];
 		for(int i = 0; i < 8; i++){
 			for(int j = 0; j < 8; j++){
-				if((i+j) % 2 == 1) checkers[i][j] = null;
-				else checkers[i][j] = new Checker(i, j, true);
+				if(((i+j) % 2 == 0) || (i > 2 && i < 5)) checkers[i][j] = null;
+				else checkers[i][j] = (i > 4) ? new Checker(i, j, true) : new Checker(i, j, false);
 			}
 		}
 	}
@@ -25,12 +27,12 @@ public class Board {
 			for(int j = 0; j < 8; j++){
 				if(checkers[i][j] == null){
 					add = "-";
-				}else{if(checkers[i][j].isRed()) add = "R"; else add = "B";}
+				}else{add = checkers[i][j].toString();}
 				output = output + " " + add;
 			}
 			output = output + " |\n";
 		}
-		output = output + "  _ _ _ _ _ _ _ _";
+		output = output + "  ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾\n\n It is player " + player + "'s turn.";
 		return output;
 	}
 }
