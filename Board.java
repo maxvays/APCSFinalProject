@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 public class Board {
 	private Checker[][] checkers;
@@ -5,7 +8,21 @@ public class Board {
 	
 	public static void main(String[] args){
 		Board board = new Board();
-		System.out.print(board);
+		Scanner reader = new Scanner(System.in);
+		System.out.println("Player 1 is red.\n");
+		System.out.println(board);
+		String moveposition;
+		List<String> move = new ArrayList<String>();
+		moveposition = reader.nextLine();
+		while(!moveposition.isEmpty()){
+			move.add(moveposition);
+			moveposition = reader.nextLine();
+		}
+		System.out.println(move);
+		String[] a = new String[1];
+		board.makeMove(move.toArray(a));
+		System.out.println(board);
+		reader.close();
 	}
 	
 	public Board(){
@@ -19,20 +36,41 @@ public class Board {
 		}
 	}
 	
+	public void makeMove(String[] positions){
+		int[][] coordinates = new int[positions.length][2];
+		for (int i = 0; i < positions.length; i++){
+			coordinates[i][0] = (int)positions[i].charAt(0) - 96;
+			coordinates[i][1] = (int)positions[i].charAt(1) - 48;
+		}
+		swapCheckers(coordinates[0],coordinates[coordinates.length - 1]);
+	}
+	
+	public void swapCheckers(int[] start, int[] end){
+		int startrow = 8 - start[1];
+		int startcol = start[0] - 1;
+		int endcol = end[0] - 1;
+		int endrow = 8 - end[1];
+		System.out.println(startrow);
+		System.out.println(startcol);
+		checkers[startrow][startcol].setColumn(endcol);
+		checkers[startrow][startcol].setRow(endrow);
+		checkers[endrow][endcol] = checkers[startrow][startcol];
+		checkers[startrow][startcol] = null;
+	}
+	
 	public String toString(){
-		String output = "  _ _ _ _ _ _ _ _\n";
+		String output = "    _ _ _ _ _ _ _ _\n";
 		String add;
 		for(int i = 0; i < 8; i++){
-			output = output + "|";
+			output = output + Integer.toString(8 - i) + " |";
+			//output = output + (char)(8 - i) + " |";
 			for(int j = 0; j < 8; j++){
-				if(checkers[i][j] == null){
-					add = "-";
-				}else{add = checkers[i][j].toString();}
+				add = (checkers[i][j] == null) ? "-" : checkers[i][j].toString();
 				output = output + " " + add;
 			}
 			output = output + " |\n";
 		}
-		output = output + "  ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾\n\n It is player " + player + "'s turn.";
+		output = output + "    ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾\n    a b c d e f g h\n\n It is player " + player + "'s turn.";
 		return output;
 	}
 }
