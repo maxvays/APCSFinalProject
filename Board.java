@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Board {
 	private Checker[][] checkers;
 	private int player;
+	private boolean gameover;
 	
 	public static void main(String[] args){
 		Board board = new Board();
@@ -13,20 +14,24 @@ public class Board {
 		System.out.println(board);
 		String moveposition;
 		List<String> move = new ArrayList<String>();
-		moveposition = reader.nextLine();
-		while(!moveposition.isEmpty()){
-			move.add(moveposition);
+		while(!board.gameover){
+			move.clear();
 			moveposition = reader.nextLine();
-		}
-		System.out.println(move);
-		String[] a = new String[1];
-		board.makeMove(move.toArray(a));
-		System.out.println(board);
+			while(!moveposition.isEmpty()){
+				move.add(moveposition);
+				moveposition = reader.nextLine();
+			}
+			System.out.println(move);
+			String[] a = new String[1];
+			board.makeMove(move.toArray(a));
+			board.player = 3 - board.player;
+			System.out.println(board);}
 		reader.close();
 	}
 	
 	public Board(){
 		player = 1;
+		gameover = false;
 		checkers = new Checker[8][8];
 		for(int i = 0; i < 8; i++){
 			for(int j = 0; j < 8; j++){
@@ -59,18 +64,34 @@ public class Board {
 	}
 	
 	public String toString(){
-		String output = "    _ _ _ _ _ _ _ _\n";
-		String add;
-		for(int i = 0; i < 8; i++){
-			output = output + Integer.toString(8 - i) + " |";
-			//output = output + (char)(8 - i) + " |";
-			for(int j = 0; j < 8; j++){
-				add = (checkers[i][j] == null) ? "-" : checkers[i][j].toString();
-				output = output + " " + add;
+		String output;
+		if(player == 1){
+			output = "    _ _ _ _ _ _ _ _\n";
+			String add;
+			for(int i = 0; i < 8; i++){
+				output = output + Integer.toString(8 - i) + " |";
+				//output = output + (char)(8 - i) + " |";
+				for(int j = 0; j < 8; j++){
+					add = (checkers[i][j] == null) ? "-" : checkers[i][j].toString();
+					output = output + " " + add;
+				}
+				output = output + " |\n";
 			}
-			output = output + " |\n";
+			output = output + "    ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾\n    a b c d e f g h\n\n It is player " + player + "'s turn.";}
+		else{
+			output = "    _ _ _ _ _ _ _ _\n";
+			String add;
+			for(int i = 7; i >= 0; i--){
+				output = output + Integer.toString(8 - i) + " |";
+				//output = output + (char)(8 - i) + " |";
+				for(int j = 7; j >= 0; j--){
+					add = (checkers[i][j] == null) ? "-" : checkers[i][j].toString();
+					output = output + " " + add;
+				}
+				output = output + " |\n";
+			}
+			output = output + "    ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾\n    h g f e d c b a\n\n It is player " + player + "'s turn.";
 		}
-		output = output + "    ‾ ‾ ‾ ‾ ‾ ‾ ‾ ‾\n    a b c d e f g h\n\n It is player " + player + "'s turn.";
 		return output;
 	}
 }
