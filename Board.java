@@ -47,7 +47,7 @@ public class Board {
 			coordinates[i][0] = (int)positions[i].charAt(0) - 96;
 			coordinates[i][1] = (int)positions[i].charAt(1) - 48;
 		}
-		swapCheckers(coordinates[0],coordinates[coordinates.length - 1]);
+		if(checkValidMove(coordinates)) swapCheckers(coordinates[0],coordinates[coordinates.length - 1]);
 	}
 	
 	public void swapCheckers(int[] start, int[] end){
@@ -61,6 +61,45 @@ public class Board {
 		checkers[startrow][startcol].setRow(endrow);
 		checkers[endrow][endcol] = checkers[startrow][startcol];
 		checkers[startrow][startcol] = null;
+	}
+	
+	public boolean checkValidMove(int[][] moves){
+		boolean valid = false;
+		Checker startChecker = checkers[8 - moves[0][1]][moves[0][0] - 1];
+		System.out.println(startChecker);
+		if(startChecker == null) return false;
+		if(moves.length == 2) valid = valid || checkNonCapture(moves);
+		valid = valid || checkCapture(moves);
+		return valid;
+	}
+	
+	public boolean checkNonCapture(int[][] moves){
+		Checker startChecker = checkers[8 - moves[0][1]][moves[0][0] - 1];
+		System.out.print("hi");
+		if(Math.abs(moves[0][1] - moves[1][1]) != Math.abs(moves[0][0] - moves[1][0])) return false;
+		if(checkers[8 - moves[1][1]][moves[1][0] - 1] != null) return false;
+		if(startChecker.isKing()){
+			int numCheckersBetween = 0;
+			for(int i = 1; i <= Math.abs(moves[0][1] - moves[1][1]); i++){
+				if(checkers[(int) (8 - moves[0][1] + Math.signum(moves[0][1] - moves[1][1]) * i)][(int) (moves[0][0] - 1 - Math.signum(moves[0][0] - moves[1][0]) * i)] != null) numCheckersBetween++;
+			}
+			if(numCheckersBetween > 0) return false;
+		}else{
+			if(startChecker.isRed()){
+				if(startChecker.getColumn() > 0 && startChecker.getColumn() < 7) {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() - 1] == null || checkers[startChecker.getRow() - 1][startChecker.getColumn() + 1] == null)) return false;}
+				else {if(startChecker.getColumn() > 0) {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() - 1] == null)) return false;}
+				else {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() + 1] == null)) return false;}}
+			}else{
+				if(startChecker.getColumn() > 0 && startChecker.getColumn() < 7) {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() - 1] == null || checkers[startChecker.getRow() + 1][startChecker.getColumn() + 1] == null)) return false;}
+				else {if(startChecker.getColumn() > 0) {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() - 1] == null)) return false;}
+				else {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() + 1] == null)) return false;}}
+			}
+		}
+		return true;
+	}
+	
+	public boolean checkCapture(int[][] moves){
+		return false;
 	}
 	
 	public String toString(){
