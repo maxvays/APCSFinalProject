@@ -47,7 +47,15 @@ public class Board {
 			coordinates[i][0] = (int)positions[i].charAt(0) - 96;
 			coordinates[i][1] = (int)positions[i].charAt(1) - 48;
 		}
-		if(checkValidMove(coordinates)) swapCheckers(coordinates[0],coordinates[coordinates.length - 1]);
+		char moveType = checkValidMove(coordinates);
+		if(moveType == 'n') swapCheckers(coordinates[0],coordinates[coordinates.length - 1]);
+		else if(moveType == 'c'){
+			swapCheckers(coordinates[0], coordinates[coordinates.length - 1]);
+			for(int i = 1; i < coordinates.length; i++){
+				System.out.println("Removing taken pieces");
+				checkers[8 - (coordinates[i][1] + coordinates[i-1][1]) / 2][(coordinates[i][0] + coordinates[i-1][0]) / 2 - 1] = null;
+			}
+		}
 	}
 	
 	public void swapCheckers(int[] start, int[] end){
@@ -55,27 +63,25 @@ public class Board {
 		int startcol = start[0] - 1;
 		int endcol = end[0] - 1;
 		int endrow = 8 - end[1];
-		System.out.println(startrow);
-		System.out.println(startcol);
+		System.out.println("swapping checkers");
 		checkers[startrow][startcol].setColumn(endcol);
 		checkers[startrow][startcol].setRow(endrow);
 		checkers[endrow][endcol] = checkers[startrow][startcol];
 		checkers[startrow][startcol] = null;
 	}
 	
-	public boolean checkValidMove(int[][] moves){
-		boolean valid = false;
+	public char checkValidMove(int[][] moves){
 		Checker startChecker = checkers[8 - moves[0][1]][moves[0][0] - 1];
-		System.out.println(startChecker);
-		if(startChecker == null) return false;
-		if(moves.length == 2) valid = valid || checkNonCapture(moves);
-		valid = valid || checkCapture(moves);
-		return valid;
+		System.out.println("checking valid move");
+		if(startChecker == null) return 'f';
+		if(moves.length == 2) if(checkNonCapture(moves)) return 'n';
+		if(checkCapture(moves)) return 'c';
+		return 'f';
 	}
 	
 	public boolean checkNonCapture(int[][] moves){
 		Checker startChecker = checkers[8 - moves[0][1]][moves[0][0] - 1];
-		System.out.print("hi");
+		System.out.println("checking non capture");
 		if(Math.abs(moves[0][1] - moves[1][1]) != Math.abs(moves[0][0] - moves[1][0])) return false;
 		if(checkers[8 - moves[1][1]][moves[1][0] - 1] != null) return false;
 		if(startChecker.isKing()){
@@ -85,6 +91,7 @@ public class Board {
 			}
 			if(numCheckersBetween > 0) return false;
 		}else{
+			if(Math.abs(moves[0][1] - moves[1][1]) != 1 || Math.abs(moves[0][0] - moves[1][0]) != 1) return false;
 			if(startChecker.isRed()){
 				if(startChecker.getColumn() > 0 && startChecker.getColumn() < 7) {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() - 1] == null || checkers[startChecker.getRow() - 1][startChecker.getColumn() + 1] == null)) return false;}
 				else {if(startChecker.getColumn() > 0) {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() - 1] == null)) return false;}
@@ -92,14 +99,22 @@ public class Board {
 			}else{
 				if(startChecker.getColumn() > 0 && startChecker.getColumn() < 7) {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() - 1] == null || checkers[startChecker.getRow() + 1][startChecker.getColumn() + 1] == null)) return false;}
 				else {if(startChecker.getColumn() > 0) {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() - 1] == null)) return false;}
-				else {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() + 1] == null)) return false;}}
+				else {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() + 1] == null)) return false;}}
 			}
 		}
 		return true;
 	}
 	
 	public boolean checkCapture(int[][] moves){
-		return false;
+		System.out.println("checking capture");
+		Checker startChecker = checkers[8 - moves[0][1]][moves[0][0] - 1];
+		if(startChecker == null) return false;
+		for(int i = 1; i < moves.length; i++){
+			if(Math.abs(moves[i][0] - moves[i-1][0]) != 2) return false;
+			if(Math.abs(moves[i][1] - moves[i-1][1]) != 2) return false;
+			if(checkers[8 - (moves[i][1] + moves[i-1][1]) / 2][(moves[i][0] + moves[i-1][0]) / 2 - 1] == null) return false;
+		}
+		return true;
 	}
 	
 	public String toString(){
