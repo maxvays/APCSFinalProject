@@ -16,3 +16,5 @@ Development Log
 1/10: Make a method checkValidMove which checks if a move is valid. Uses helper functions checkNonCapture (implemented) and checkCapture (not yet implemented).
 
 1/17: Complete makeMove so that it can handle both non capture and capture moves.
+
+1/20: Finish methods which check if moves are valid, for both king and normal pieces
