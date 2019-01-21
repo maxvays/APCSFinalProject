@@ -25,7 +25,8 @@ public class Board {
 			String[] a = new String[1];
 			board.makeMove(move.toArray(a));
 			board.player = 3 - board.player;
-			System.out.println(board);}
+			System.out.println(board);
+		}
 		reader.close();
 	}
 	
@@ -36,9 +37,24 @@ public class Board {
 		for(int i = 0; i < 8; i++){
 			for(int j = 0; j < 8; j++){
 				if(((i+j) % 2 == 0) || (i > 2 && i < 5)) checkers[i][j] = null;
-				else checkers[i][j] = (i > 4) ? new Checker(i, j, true) : new Checker(i, j, false);
+				else {
+					checkers[i][j] = (i > 4) ? new Checker(i, j, true) : new Checker(i, j, false);
+				}
 			}
 		}
+	}
+	
+	public Board(Board board){
+		Checker[][] checkers = new Checker[8][8];
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				if(board.checkers[i][j] == null) checkers[i][j] = null;
+				else checkers[i][j] = new Checker(board.checkers[i][j]);
+			}
+		}
+		this.checkers = checkers;
+		player = board.player;
+		gameover = board.gameover;
 	}
 	
 	public void makeMove(String[] positions){
@@ -93,13 +109,9 @@ public class Board {
 		}else{
 			if(Math.abs(moves[0][1] - moves[1][1]) != 1 || Math.abs(moves[0][0] - moves[1][0]) != 1) return false;
 			if(startChecker.isRed()){
-				if(startChecker.getColumn() > 0 && startChecker.getColumn() < 7) {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() - 1] == null || checkers[startChecker.getRow() - 1][startChecker.getColumn() + 1] == null)) return false;}
-				else {if(startChecker.getColumn() > 0) {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() - 1] == null)) return false;}
-				else {if(!(checkers[startChecker.getRow() - 1][startChecker.getColumn() + 1] == null)) return false;}}
+				if(moves[1][1] < moves[0][1]) return false;
 			}else{
-				if(startChecker.getColumn() > 0 && startChecker.getColumn() < 7) {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() - 1] == null || checkers[startChecker.getRow() + 1][startChecker.getColumn() + 1] == null)) return false;}
-				else {if(startChecker.getColumn() > 0) {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() - 1] == null)) return false;}
-				else {if(!(checkers[startChecker.getRow() + 1][startChecker.getColumn() + 1] == null)) return false;}}
+				if(moves[1][1] > moves[0][1]) return false;
 			}
 		}
 		return true;
@@ -107,14 +119,117 @@ public class Board {
 	
 	public boolean checkCapture(int[][] moves){
 		System.out.println("checking capture");
-		Checker startChecker = checkers[8 - moves[0][1]][moves[0][0] - 1];
+		boolean makeKing = false;
+		Board _board = new Board(this);
+		Checker startChecker = _board.checkers[8 - moves[0][1]][moves[0][0] - 1];
 		if(startChecker == null) return false;
 		for(int i = 1; i < moves.length; i++){
-			if(Math.abs(moves[i][0] - moves[i-1][0]) != 2) return false;
-			if(Math.abs(moves[i][1] - moves[i-1][1]) != 2) return false;
-			if(checkers[8 - (moves[i][1] + moves[i-1][1]) / 2][(moves[i][0] + moves[i-1][0]) / 2 - 1] == null) return false;
+			if(_board.checkers[8 - moves[i][1]][moves[i][0] - 1] != null) return false;
+			if(startChecker.isKing()){
+				if(Math.abs(moves[i][0] - moves[i-1][0]) != Math.abs(moves[i][1] - moves[i-1][1])) return false;
+				int numCheckersBetween = 0;
+				for(int j = 1; j <= Math.abs(moves[i-1][1] - moves[i][1]); j++){
+					if(_board.checkers[(int) (8 - moves[i-1][1] + Math.signum(moves[i-1][1] - moves[i][1]) * j)][(int) (moves[i-1][0] - 1 - Math.signum(moves[i-1][0] - moves[i][0]) * j)] != null){
+						numCheckersBetween = (_board.checkers[(int) (8 - moves[i-1][1] + Math.signum(moves[i-1][1] - moves[i][1]) * j)][(int) (moves[i-1][0] - 1 - Math.signum(moves[i-1][0] - moves[i][0]) * j)].isRed() == startChecker.isRed()) ? numCheckersBetween + 2 : numCheckersBetween + 1;
+						_board.checkers[(int) (8 - moves[i-1][1] + Math.signum(moves[i-1][1] - moves[i][1]) * j)][(int) (moves[i-1][0] - 1 - Math.signum(moves[i-1][0] - moves[i][0]) * j)].setIsRed(startChecker.isRed());
+					}
+				}
+			if(numCheckersBetween != 1) return false;
+			}else{
+				if(Math.abs(moves[i][0] - moves[i-1][0]) != 2) return false;
+				if(Math.abs(moves[i][1] - moves[i-1][1]) != 2) return false;
+				if(_board.checkers[8 - (moves[i][1] + moves[i-1][1]) / 2][(moves[i][0] + moves[i-1][0]) / 2 - 1] == null || !(_board.checkers[8 - (moves[i][1] + moves[i-1][1]) / 2][(moves[i][0] + moves[i-1][0]) / 2 - 1].isRed() ^ startChecker.isRed())) return false;
+				else _board.checkers[8 - (moves[i][1] + moves[i-1][1]) / 2][(moves[i][0] + moves[i-1][0]) / 2 - 1].setIsRed(startChecker.isRed());
+			}
+			int kingRow = (startChecker.isRed()) ? 8 : 1;
+			if(moves[i][1] == kingRow){
+				makeKing = true;
+				startChecker.setIsKing(true);
+			}
 		}
+		if(makeKing) checkers[8 - moves[0][1]][moves[0][0] - 1].setIsKing(true);
 		return true;
+	}
+	
+	public boolean availableCaptureMoves(){
+		boolean playerIsRed = (player == 1) ? true : false;
+		Checker currChecker;
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 4; j++){
+				currChecker = checkers[i][2 * j + ((i + 1) % 2)];
+				if(currChecker != null && currChecker.isRed() == playerIsRed){
+					if(currChecker.isKing()){
+						for(int k = -7; k < 8; k++){
+							if(currChecker.getRow() + k > 0 && currChecker.getRow() + k < 8 && currChecker.getColumn() + k > 0 && currChecker.getColumn() + k < 8){
+								if(checkCapture(new int[][] {new int[] {currChecker.getColumn() + 1, 8 - currChecker.getRow()}, new int[] {currChecker.getColumn() + k + 1, 8 - (currChecker.getRow() + k)}})) return true;
+							}
+						}
+						for(int k = -7; k < 8; k++){
+							if(currChecker.getRow() + k > 0 && currChecker.getRow() + k < 8 && currChecker.getColumn() - k > 0 && currChecker.getColumn() - k < 8){
+								if(checkCapture(new int[][] {new int[] {currChecker.getColumn() + 1, 8 - currChecker.getRow()}, new int[] {currChecker.getColumn() - k + 1, 8 - (currChecker.getRow() + k)}})) return true;
+							}
+						}
+					}else{
+						if(currChecker.getRow() > 1 && currChecker.getColumn() > 1){
+							if(checkers[currChecker.getRow() - 1][currChecker.getColumn() - 1] != null){
+								if(checkers[currChecker.getRow() - 1][currChecker.getColumn() - 1].isRed() != currChecker.isRed() && checkers[currChecker.getRow() - 2][currChecker.getColumn() - 2] == null) return true;
+							}
+						}
+						if(currChecker.getRow() > 1 && currChecker.getColumn() < 6){
+							if(checkers[currChecker.getRow() - 1][currChecker.getColumn() + 1] != null){
+								if(checkers[currChecker.getRow() - 1][currChecker.getColumn() + 1].isRed() != currChecker.isRed() && checkers[currChecker.getRow() - 2][currChecker.getColumn() + 2] == null) return true;
+							}
+						}
+						if(currChecker.getRow() < 6 && currChecker.getColumn() > 1){
+							if(checkers[currChecker.getRow() + 1][currChecker.getColumn() - 1] != null){
+								if(checkers[currChecker.getRow() + 1][currChecker.getColumn() - 1].isRed() != currChecker.isRed() && checkers[currChecker.getRow() + 2][currChecker.getColumn() - 2] == null) return true;
+							}
+						}
+						if(currChecker.getRow() < 6 && currChecker.getColumn() < 6){
+							if(checkers[currChecker.getRow() + 1][currChecker.getColumn() + 1] != null){
+								if(checkers[currChecker.getRow() + 1][currChecker.getColumn() + 1].isRed() != currChecker.isRed() && checkers[currChecker.getRow() + 2][currChecker.getColumn() + 2] == null) return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean availableNonCaptureMoves(){
+		boolean playerIsRed = (player == 1) ? true : false;
+		Checker currChecker;
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 4; j++){
+				currChecker = checkers[i][2 * j + ((i + 1) % 2)];
+				if(currChecker != null && currChecker.isRed() == playerIsRed){
+					if(currChecker.isKing()){
+						if(currChecker.getColumn() > 0) {
+							if(currChecker.getRow() > 0) if((checkers[currChecker.getRow() - 1][currChecker.getColumn() - 1] == null)) return true;
+							if(currChecker.getRow() < 7) if((checkers[currChecker.getRow() + 1][currChecker.getColumn() - 1] == null)) return true;
+						}
+						if(currChecker.getColumn() < 7) {
+							if(currChecker.getRow() > 0) if((checkers[currChecker.getRow() - 1][currChecker.getColumn() + 1] == null)) return true;
+							if(currChecker.getRow() < 7) if((checkers[currChecker.getRow() + 1][currChecker.getColumn() + 1] == null)) return true;
+						}
+					}else{
+						if(currChecker.isRed()){
+							if(currChecker.getColumn() > 0) {if((checkers[currChecker.getRow() - 1][currChecker.getColumn() - 1] == null)) return true;}
+							if(currChecker.getColumn() < 7) {if((checkers[currChecker.getRow() - 1][currChecker.getColumn() + 1] == null)) return true;}
+						}else{
+							if(currChecker.getColumn() > 0) {if((checkers[currChecker.getRow() + 1][currChecker.getColumn() - 1] == null)) return true;}
+							if(currChecker.getColumn() < 7) {if((checkers[currChecker.getRow() + 1][currChecker.getColumn() + 1] == null)) return true;}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	public Checker[][] getCheckers(){
+		return checkers;
 	}
 	
 	public String toString(){
