@@ -40,12 +40,12 @@ On your turn, you will be prompted to enter coordinates for your move. The coord
 where the letter and number are given on the sides of the board. The first coordinate you enter is the checker you are
 moving. Subsequent coordinates are the squares your checker jumps to. You will see the following prompts:
 
-Enter the coordinates of the checker you wish to move: a3
+> Enter the coordinates of the checker you wish to move: a3
 
-Enter the coordinates of the next square you want your checker to jump to,
+> Enter the coordinates of the next square you want your checker to jump to,
 or press enter if there are no more jumps:b4
 
-Enter the coordinates of the next square you want your checker to jump to,
+> Enter the coordinates of the next square you want your checker to jump to,
 or press enter if there are no more jumps:
 
 After you press enter, if the move is valid, the move will be made, the board will be flipped, and it will be the other player's turn. Keep playing until someone wins.
