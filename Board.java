@@ -239,6 +239,8 @@ public class Board {
 				startChecker.setIsKing(true); //the copy checker is made a king
 			}
 		}
+		_board.swapCheckers(moves[0], moves[moves.length-1]);
+		if(_board.checkers[8 - moves[moves.length-1][1]][moves[moves.length-1][0] - 1].availableCaptures(_board)) return false; //check if the checker can make any more captures
 		if(makeKing) checkers[8 - moves[0][1]][moves[0][0] - 1].setIsKing(true); //if the move is valid, and makeKing is true, make the actual starting checker a king
 		return true;
 	}
