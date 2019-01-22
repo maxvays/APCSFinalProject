@@ -176,6 +176,7 @@ public class Board {
 	 */
 	public boolean checkNonCapture(int[][] moves){
 		Checker startChecker = checkers[8 - moves[0][1]][moves[0][0] - 1]; //the checker being moved
+		if(startChecker == null) return false; //check if there is a starting checker
 		if(Math.abs(moves[0][1] - moves[1][1]) != Math.abs(moves[0][0] - moves[1][0])) return false; //check if the checker is moving diagonally
 		if(checkers[8 - moves[1][1]][moves[1][0] - 1] != null) return false; //check if the ending position already has a checker
 		if(startChecker.isKing()){
@@ -209,6 +210,7 @@ public class Board {
 		boolean makeKing = false; //whether the starting checker should be made a king or not
 		Board _board = new Board(this); //make a copy of the board (so it can be manipulated)
 		Checker startChecker = _board.checkers[8 - moves[0][1]][moves[0][0] - 1]; //the checker being moved
+		if(startChecker == null) return false; //check if there is a starting checker
 		//loop over each jump
 		for(int i = 1; i < moves.length; i++){
 			if(_board.checkers[8 - moves[i][1]][moves[i][0] - 1] != null) return false; //check if there is already a checker where the starting checker is jumping to
