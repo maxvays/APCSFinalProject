@@ -45,7 +45,7 @@ public class Board {
 					continue; //skip adding moveposition to move (since it's invalid)
 				}
 				move.add(moveposition); //add moveposition to the sequence of moves
-				System.out.print("Enter the coordinates of the next square you want your checker to jump to,\nor click enter if there are no more jumps:");
+				System.out.print("Enter the coordinates of the next square you want your checker to jump to,\nor press enter if there are no more jumps: ");
 				moveposition = reader.nextLine(); //get the next position the player wants to move the checker to
 			}
 			String[] a = new String[1]; //variable of type String array used to convert move to a String array
