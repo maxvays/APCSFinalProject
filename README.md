@@ -21,6 +21,7 @@ Development Log
 
 1/21: Finish game mechanics. Add documentation/comments.
 
+1/22: Final bugfixes
 
 
 # How to Compile
