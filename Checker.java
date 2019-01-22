@@ -111,7 +111,7 @@ public class Checker {
 			//loop over all squares on the downwards diagonal containing the checker
 			for(int k = -7; k < 8; k++){
 				if(this.getRow() + k > 0 && this.getRow() + k < 8 && this.getColumn() - k > 0 && this.getColumn() - k < 8){
-					if(board.checkCapture(new int[][] {new int[] {this.getColumn() - 1, 8 - this.getRow()}, new int[] {this.getColumn() - k + 1, 8 - (this.getRow() + k)}})) return true; //check if the checker can jump to that square with a capture
+					if(board.checkCapture(new int[][] {new int[] {this.getColumn() + 1, 8 - this.getRow()}, new int[] {this.getColumn() - k + 1, 8 - (this.getRow() + k)}})) return true; //check if the checker can jump to that square with a capture
 				}
 			}
 		}else{
